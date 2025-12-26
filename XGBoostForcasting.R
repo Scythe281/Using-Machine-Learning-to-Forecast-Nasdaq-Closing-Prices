@@ -151,8 +151,12 @@ print(paste("R^2%:", round(r_squared,3)*100))
 hit_ratio <- mean(sign(predictions) == sign(Y_test))
 print(paste("Directional Accuracy (Hit Ratio):", round(hit_ratio * 100, 2), "%"))
 
-#Lets make a plot of our hit rate where 1 means model and result are in the same direction, -1 means they are in opposite directions
+#Since we remove all non-stationary data from our test/train sets, we have to get raw data from masterTable, accounting to drop NA values
+test_dates = masterTable %>% 
+  filter(between(Date, as.Date("2025-01-01"), as.Date("2025-11-11"))) %>%
+  drop_na()
 
+#Lets make a plot of our hit rate where 1 means model and result are in the same direction, -1 means they are in opposite directions
 accuracyTable = tibble(
   Date  = test_dates$Date,
   directionalResult = ifelse(sign(predictions) == sign(Y_test), 1, -1)
@@ -187,10 +191,6 @@ ggplot(data = accuracyTable,
     legend.position = "none" # Legend is redundant since colors are intuitive
   )
 
-#Since we remove all non-stationary data from our test/train sets, we have to get raw data from masterTable, accounting to drop NA values
-test_dates <- masterTable %>% 
-  filter(between(Date, as.Date("2025-01-01"), as.Date("2025-11-11"))) %>%
-  drop_na()
 
 closeLagForPredictions = test_dates$Nasdaq_CloseLag
 #Converting log returns back to raw prices
